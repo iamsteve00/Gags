@@ -106,4 +106,48 @@ CloseButton.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
--- Add remaining functionalities for "Others," "Player," and "Troll" tabs...
+-- Implement "Others" options
+local OthersFrame = Instance.new("Frame")
+OthersFrame.Name = "OthersFrame"
+OthersFrame.Parent = ScreenGui
+OthersFrame.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+OthersFrame.Size = UDim2.new(0, 300, 0, 200)
+OthersFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+OthersFrame.Visible = false
+
+local FlyFrame = Instance.new("Frame")
+FlyFrame.Parent = OthersFrame
+FlyFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 255)
+FlyFrame.Size = UDim2.new(0, 280, 0, 80)
+FlyFrame.Position = UDim2.new(0, 10, 0, 10)
+
+local FlySpeedInput = Instance.new("TextBox")
+FlySpeedInput.Parent = FlyFrame
+FlySpeedInput.PlaceholderText = "Enter Fly Speed"
+FlySpeedInput.Size = UDim2.new(0, 260, 0, 30)
+FlySpeedInput.Position = UDim2.new(0, 10, 0, 10)
+
+local FlyActivateButton = Instance.new("TextButton")
+FlyActivateButton.Parent = FlyFrame
+FlyActivateButton.Text = "Activate Fly"
+FlyActivateButton.Size = UDim2.new(0, 120, 0, 30)
+FlyActivateButton.Position = UDim2.new(0, 10, 0, 50)
+
+local FlyDeactivateButton = Instance.new("TextButton")
+FlyDeactivateButton.Parent = FlyFrame
+FlyDeactivateButton.Text = "Deactivate Fly"
+FlyDeactivateButton.Size = UDim2.new(0, 120, 0, 30)
+FlyDeactivateButton.Position = UDim2.new(0, 140, 0, 50)
+
+OthersTab.MouseButton1Click:Connect(function()
+    Frame.Visible = false -- Hide main frame
+    OthersFrame.Visible = true -- Show OthersFrame
+end)
+
+FlyActivateButton.MouseButton1Click:Connect(function()
+    -- Fly logic here
+end)
+
+FlyDeactivateButton.MouseButton1Click:Connect(function()
+    -- Fly deactivation logic here
+end)
