@@ -151,3 +151,5 @@ end)
 FlyDeactivateButton.MouseButton1Click:Connect(function()
     -- Fly deactivation logic here
 end)
+
+-- Additional logic for Player, Troll, and audio playback will be implemented as requested.
