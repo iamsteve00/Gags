@@ -1,35 +1,63 @@
 
--- Main interface setup
+-- Creating the Main Interface
 local ScreenGui = Instance.new("ScreenGui")
 local Frame = Instance.new("Frame")
-local MinimizedButton = Instance.new("TextButton")
-local CloseButton = Instance.new("TextButton")
-local TrollTab = Instance.new("TextButton")
-local PlayerTab = Instance.new("TextButton")
-local OthersTab = Instance.new("TextButton")
-local MinimizedIcon = Instance.new("ImageButton")
 
--- Set up the main interface
 ScreenGui.Name = "CustomScript"
 ScreenGui.Parent = game.CoreGui
 
 Frame.Name = "MainFrame"
 Frame.Parent = ScreenGui
-Frame.BackgroundColor3 = Color3.fromRGB(255, 182, 193) -- Hearts theme
+Frame.BackgroundColor3 = Color3.fromRGB(255, 182, 193) -- Theme color
 Frame.Position = UDim2.new(0.5, -150, 0.5, -100)
 Frame.Size = UDim2.new(0, 300, 0, 200)
 
-MinimizedButton.Name = "MinimizeButton"
-MinimizedButton.Parent = Frame
-MinimizedButton.Text = "Minimize"
-MinimizedButton.Size = UDim2.new(0, 100, 0, 30)
-MinimizedButton.Position = UDim2.new(0, 10, 0, 160)
+-- Navigation Buttons
+local MinimizeButton = Instance.new("TextButton")
+MinimizeButton.Parent = Frame
+MinimizeButton.Text = "_"
+MinimizeButton.Size = UDim2.new(0, 30, 0, 30)
+MinimizeButton.Position = UDim2.new(1, -40, 0, 10)
 
-CloseButton.Name = "CloseButton"
+local CloseButton = Instance.new("TextButton")
 CloseButton.Parent = Frame
-CloseButton.Text = "Close"
-CloseButton.Size = UDim2.new(0, 100, 0, 30)
-CloseButton.Position = UDim2.new(0, 120, 0, 160)
+CloseButton.Text = "X"
+CloseButton.Size = UDim2.new(0, 30, 0, 30)
+CloseButton.Position = UDim2.new(1, -40, 0, 50)
+
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+-- Creating the Minimized Box
+local MiniFrame = Instance.new("Frame")
+MiniFrame.Parent = ScreenGui
+MiniFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+MiniFrame.Size = UDim2.new(0, 50, 0, 50)
+MiniFrame.Position = UDim2.new(0, 20, 0, 20)
+MiniFrame.Visible = false
+MiniFrame.Active = true
+MiniFrame.Draggable = true
+
+local RestoreButton = Instance.new("TextButton")
+RestoreButton.Parent = MiniFrame
+RestoreButton.Text = "☰"
+RestoreButton.Size = UDim2.new(1, 0, 1, 0)
+
+MinimizeButton.MouseButton1Click:Connect(function()
+    Frame.Visible = false
+    MiniFrame.Visible = true
+end)
+
+RestoreButton.MouseButton1Click:Connect(function()
+    Frame.Visible = true
+    MiniFrame.Visible = false
+end)
+
+-- Creating tabs
+local TrollTab = Instance.new("TextButton")
+local PlayerTab = Instance.new("TextButton")
+local OthersTab = Instance.new("TextButton")
 
 TrollTab.Name = "TrollTab"
 TrollTab.Parent = Frame
@@ -49,107 +77,98 @@ OthersTab.Text = "Others"
 OthersTab.Size = UDim2.new(0, 80, 0, 30)
 OthersTab.Position = UDim2.new(0, 190, 0, 10)
 
--- Minimized state button (Image "E")
-MinimizedIcon.Name = "MinimizedIcon"
-MinimizedIcon.Parent = ScreenGui
-MinimizedIcon.Image = "rbxassetid://YOUR_ASSET_ID" -- Replace with your "E" image asset ID
-MinimizedIcon.Size = UDim2.new(0, 50, 0, 50)
-MinimizedIcon.Position = UDim2.new(0.5, -25, 0.5, -25)
-MinimizedIcon.Visible = false
-MinimizedIcon.BackgroundTransparency = 1
+-- Function to create "Back" buttons
+local function createBackButton(parent)
+    local BackButton = Instance.new("TextButton")
+    BackButton.Parent = parent
+    BackButton.Text = "Back"
+    BackButton.Size = UDim2.new(0, 80, 0, 30)
+    BackButton.Position = UDim2.new(0, 10, 1, -40)
+    BackButton.MouseButton1Click:Connect(function()
+        parent.Visible = false
+        Frame.Visible = true
+    end)
+end
 
--- Dragging functionality for the minimized button
-local UIS = game:GetService("UserInputService")
-local dragging = false
-local dragStart, startPos
+-- Creating Tabs and Features
+local TrollFrame = Instance.new("Frame")
+TrollFrame.Parent = ScreenGui
+TrollFrame.Size = UDim2.new(0, 300, 0, 250)
+TrollFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+TrollFrame.Visible = false
+createBackButton(TrollFrame)
 
-MinimizedIcon.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = MinimizedIcon.Position
+local MapFrame = Instance.new("Frame")
+MapFrame.Parent = ScreenGui
+MapFrame.Size = UDim2.new(0, 300, 0, 250)
+MapFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+MapFrame.Visible = false
+createBackButton(MapFrame)
+
+local MoveObjectButton = Instance.new("TextButton")
+MoveObjectButton.Parent = MapFrame
+MoveObjectButton.Text = "Move Objects"
+MoveObjectButton.Size = UDim2.new(0, 120, 0, 30)
+MoveObjectButton.Position = UDim2.new(0, 140, 0, 50)
+
+MoveObjectButton.MouseButton1Click:Connect(function()
+    for _, obj in ipairs(game.Workspace:GetChildren()) do
+        if obj:IsA("Model") or obj:IsA("Part") then
+            obj:SetPrimaryPartCFrame(obj:GetPrimaryPartCFrame() * CFrame.new(math.random(-20, 20), 0, math.random(-20, 20)))
+        end
     end
 end)
 
-MinimizedIcon.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
-    end
-end)
-
-UIS.InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - dragStart
-        MinimizedIcon.Position = UDim2.new(
-            startPos.X.Scale,
-            startPos.X.Offset + delta.X,
-            startPos.Y.Scale,
-            startPos.Y.Offset + delta.Y
-        )
-    end
-end)
-
--- Restore the interface when clicking on the minimized icon
-MinimizedIcon.MouseButton1Click:Connect(function()
-    Frame.Visible = true
-    MinimizedIcon.Visible = false
-end)
-
--- Minimize button functionality
-MinimizedButton.MouseButton1Click:Connect(function()
-    Frame.Visible = false
-    MinimizedIcon.Visible = true
-end)
-
--- Close button functionality
-CloseButton.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
-end)
-
--- Implement "Others" options
 local OthersFrame = Instance.new("Frame")
-OthersFrame.Name = "OthersFrame"
 OthersFrame.Parent = ScreenGui
-OthersFrame.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
-OthersFrame.Size = UDim2.new(0, 300, 0, 200)
+OthersFrame.Size = UDim2.new(0, 300, 0, 250)
 OthersFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
 OthersFrame.Visible = false
+createBackButton(OthersFrame)
 
-local FlyFrame = Instance.new("Frame")
-FlyFrame.Parent = OthersFrame
-FlyFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 255)
-FlyFrame.Size = UDim2.new(0, 280, 0, 80)
-FlyFrame.Position = UDim2.new(0, 10, 0, 10)
+local PlayerFrame = Instance.new("Frame")
+PlayerFrame.Parent = ScreenGui
+PlayerFrame.Size = UDim2.new(0, 300, 0, 250)
+PlayerFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+PlayerFrame.Visible = false
+createBackButton(PlayerFrame)
 
-local FlySpeedInput = Instance.new("TextBox")
-FlySpeedInput.Parent = FlyFrame
-FlySpeedInput.PlaceholderText = "Enter Fly Speed"
-FlySpeedInput.Size = UDim2.new(0, 260, 0, 30)
-FlySpeedInput.Position = UDim2.new(0, 10, 0, 10)
+-- Showing Tabs when clicking
+TrollTab.MouseButton1Click:Connect(function()
+    Frame.Visible = false
+    TrollFrame.Visible = true
+end)
 
-local FlyActivateButton = Instance.new("TextButton")
-FlyActivateButton.Parent = FlyFrame
-FlyActivateButton.Text = "Activate Fly"
-FlyActivateButton.Size = UDim2.new(0, 120, 0, 30)
-FlyActivateButton.Position = UDim2.new(0, 10, 0, 50)
-
-local FlyDeactivateButton = Instance.new("TextButton")
-FlyDeactivateButton.Parent = FlyFrame
-FlyDeactivateButton.Text = "Deactivate Fly"
-FlyDeactivateButton.Size = UDim2.new(0, 120, 0, 30)
-FlyDeactivateButton.Position = UDim2.new(0, 140, 0, 50)
+PlayerTab.MouseButton1Click:Connect(function()
+    Frame.Visible = false
+    PlayerFrame.Visible = true
+end)
 
 OthersTab.MouseButton1Click:Connect(function()
-    Frame.Visible = false -- Hide main frame
-    OthersFrame.Visible = true -- Show OthersFrame
+    Frame.Visible = false
+    OthersFrame.Visible = true
 end)
 
-FlyActivateButton.MouseButton1Click:Connect(function()
-    -- Fly logic here
-end)
+-- Temporary Message when Executing the Script
+local function showTemporaryMessage(messageText, duration)
+    for _, player in ipairs(game.Players:GetPlayers()) do
+        local playerGui = player:FindFirstChildOfClass("PlayerGui")
+        if playerGui then
+            local messageLabel = Instance.new("TextLabel")
+            messageLabel.Parent = playerGui
+            messageLabel.Text = messageText
+            messageLabel.Size = UDim2.new(0, 400, 0, 50)
+            messageLabel.Position = UDim2.new(0.5, -200, 0.1, 0)
+            messageLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+            messageLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+            messageLabel.TextScaled = true
+            messageLabel.Visible = true
+            
+            task.delay(duration, function()
+                messageLabel:Destroy()
+            end)
+        end
+    end
+end
 
-FlyDeactivateButton.MouseButton1Click:Connect(function()
-    -- Fly deactivation logic here
-end)
-
--- Additional logic for Player, Troll, and audio playback will be implemented as requested.
+showTemporaryMessage("emilli the Best return", 5)
