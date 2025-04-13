@@ -1,0 +1,86 @@
+-- Open source script for Roblox
+-- Compatible with Krnl executor
+
+-- Main interface setup
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local MinimizeButton = Instance.new("TextButton")
+local CloseButton = Instance.new("TextButton")
+local TrollTab = Instance.new("TextButton")
+local PlayerTab = Instance.new("TextButton")
+local OthersTab = Instance.new("TextButton")
+
+ScreenGui.Name = "CustomScript"
+ScreenGui.Parent = game.CoreGui
+
+Frame.Name = "MainFrame"
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+Frame.Position = UDim2.new(0.5, -150, 0.5, -100)
+Frame.Size = UDim2.new(0, 300, 0, 200)
+
+MinimizeButton.Name = "MinimizeButton"
+MinimizeButton.Parent = Frame
+MinimizeButton.Text = "Minimize"
+MinimizeButton.Size = UDim2.new(0, 100, 0, 30)
+MinimizeButton.Position = UDim2.new(0, 10, 0, 160)
+
+CloseButton.Name = "CloseButton"
+CloseButton.Parent = Frame
+CloseButton.Text = "Close"
+CloseButton.Size = UDim2.new(0, 100, 0, 30)
+CloseButton.Position = UDim2.new(0, 120, 0, 160)
+
+-- Tabs for organization
+TrollTab.Name = "TrollTab"
+TrollTab.Parent = Frame
+TrollTab.Text = "Troll"
+TrollTab.Size = UDim2.new(0, 80, 0, 30)
+TrollTab.Position = UDim2.new(0, 10, 0, 10)
+
+PlayerTab.Name = "PlayerTab"
+PlayerTab.Parent = Frame
+PlayerTab.Text = "Player"
+PlayerTab.Size = UDim2.new(0, 80, 0, 30)
+PlayerTab.Position = UDim2.new(0, 100, 0, 10)
+
+OthersTab.Name = "OthersTab"
+OthersTab.Parent = Frame
+OthersTab.Text = "Others"
+OthersTab.Size = UDim2.new(0, 80, 0, 30)
+OthersTab.Position = UDim2.new(0, 190, 0, 10)
+
+-- Function to play music
+function playMusic(id)
+    local Sound = Instance.new("Sound", game.Workspace)
+    Sound.SoundId = "rbxassetid://"..id
+    Sound:Play()
+end
+
+-- Function to adjust speed and jump
+function adjustPlayer(speed, jumpPower)
+    local Player = game.Players.LocalPlayer
+    Player.Character.Humanoid.WalkSpeed = speed
+    Player.Character.Humanoid.JumpPower = jumpPower
+end
+
+-- Fly function for the user
+function activateFly(flySpeed)
+    local Player = game.Players.LocalPlayer
+    local Character = Player.Character
+    local FlyPart = Instance.new("Part", Character)
+    FlyPart.Name = "FlyPart"
+    FlyPart.Size = Vector3.new(2, 2, 2)
+    FlyPart.Anchored = true
+    FlyPart.CFrame = Character.HumanoidRootPart.CFrame
+
+    game:GetService("RunService").Stepped:Connect(function()
+        FlyPart.CFrame = Character.HumanoidRootPart.CFrame * CFrame.new(0, flySpeed, 0)
+    end)
+end
+
+-- Teleport function
+function teleportTo(location)
+    local Player = game.Players.LocalPlayer
+    Player.Character.HumanoidRootPart.CFrame = location
+end# Gags
