@@ -9,13 +9,13 @@ local PlayerTab = Instance.new("TextButton")
 local OthersTab = Instance.new("TextButton")
 local MinimizedIcon = Instance.new("ImageButton")
 
--- Properties for the interface
+-- Set up the main interface
 ScreenGui.Name = "CustomScript"
 ScreenGui.Parent = game.CoreGui
 
 Frame.Name = "MainFrame"
 Frame.Parent = ScreenGui
-Frame.BackgroundColor3 = Color3.fromRGB(255, 182, 193) -- Pink for hearts theme
+Frame.BackgroundColor3 = Color3.fromRGB(255, 182, 193) -- Hearts theme
 Frame.Position = UDim2.new(0.5, -150, 0.5, -100)
 Frame.Size = UDim2.new(0, 300, 0, 200)
 
@@ -49,67 +49,61 @@ OthersTab.Text = "Others"
 OthersTab.Size = UDim2.new(0, 80, 0, 30)
 OthersTab.Position = UDim2.new(0, 190, 0, 10)
 
+-- Minimized state button (Image "E")
 MinimizedIcon.Name = "MinimizedIcon"
 MinimizedIcon.Parent = ScreenGui
-MinimizedIcon.Image = "rbxassetid://12345678" -- Replace with asset ID for an "E" icon
+MinimizedIcon.Image = "rbxassetid://YOUR_ASSET_ID" -- Replace with your "E" image asset ID
 MinimizedIcon.Size = UDim2.new(0, 50, 0, 50)
 MinimizedIcon.Position = UDim2.new(0.5, -25, 0.5, -25)
 MinimizedIcon.Visible = false
+MinimizedIcon.BackgroundTransparency = 1
 
--- Functionality mapping
-local function playMusic(id)
-    local Sound = Instance.new("Sound", game.Workspace)
-    Sound.SoundId = "rbxassetid://"..id
-    Sound:Play()
-end
+-- Dragging functionality for the minimized button
+local UIS = game:GetService("UserInputService")
+local dragging = false
+local dragStart, startPos
 
-local function adjustPlayer(speed, jumpPower)
-    local Player = game.Players.LocalPlayer
-    Player.Character.Humanoid.WalkSpeed = speed
-    Player.Character.Humanoid.JumpPower = jumpPower
-end
-
-local function activateFly(flySpeed)
-    local Player = game.Players.LocalPlayer
-    local Character = Player.Character
-    local FlyPart = Instance.new("Part", Character)
-    FlyPart.Name = "FlyPart"
-    FlyPart.Size = Vector3.new(2, 2, 2)
-    FlyPart.Anchored = true
-    FlyPart.CFrame = Character.HumanoidRootPart.CFrame
-
-    game:GetService("RunService").Stepped:Connect(function()
-        FlyPart.CFrame = Character.HumanoidRootPart.CFrame * CFrame.new(0, flySpeed, 0)
-    end)
-end
-
-local function teleportTo(location)
-    local Player = game.Players.LocalPlayer
-    Player.Character.HumanoidRootPart.CFrame = location
-end
-
-local function copySkin(targetPlayer)
-    local Player = game.Players.LocalPlayer
-    local TargetCharacter = game.Players[targetPlayer].Character
-
-    if TargetCharacter and Player.Character then
-        Player.Character.Appearance = TargetCharacter.Appearance
+MinimizedIcon.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = MinimizedIcon.Position
     end
-end
-
--- Event handling for buttons and tabs
-MinimizedButton.MouseButton1Click:Connect(function()
-    Frame.Visible = false
-    MinimizedIcon.Visible = true
 end)
 
+MinimizedIcon.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+UIS.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        MinimizedIcon.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+-- Restore the interface when clicking on the minimized icon
 MinimizedIcon.MouseButton1Click:Connect(function()
     Frame.Visible = true
     MinimizedIcon.Visible = false
 end)
 
+-- Minimize button functionality
+MinimizedButton.MouseButton1Click:Connect(function()
+    Frame.Visible = false
+    MinimizedIcon.Visible = true
+end)
+
+-- Close button functionality
 CloseButton.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
--- Add further functionalities to tabs accordingly
+-- Add remaining functionalities for "Others," "Player," and "Troll" tabs...
