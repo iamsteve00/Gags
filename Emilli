@@ -1,144 +1,136 @@
+local function ShowWelcomeMessage()
+    local WelcomeScreen = Instance.new("ScreenGui")
+    local WelcomeLabel = Instance.new("TextLabel")
 
--- Creating the Main Interface
-local ScreenGui = Instance.new("ScreenGui")
+    WelcomeScreen.Parent = game.CoreGui
+
+    WelcomeLabel.Parent = WelcomeScreen
+    WelcomeLabel.Text = "Bem-vindo ao Emilli Hub!"
+    WelcomeLabel.Size = UDim2.new(1, 0, 1, 0)
+    WelcomeLabel.TextScaled = true
+    WelcomeLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    WelcomeLabel.TextColor3 = Color3.fromRGB(255, 182, 193) -- Rosa Claro
+
+    wait(2) -- Aguarda 2 segundos antes de carregar a interface
+
+    WelcomeScreen:Destroy()
+end
+
+ShowWelcomeMessage()local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+
 local Frame = Instance.new("Frame")
-
-ScreenGui.Name = "CustomScript"
-ScreenGui.Parent = game.CoreGui
-
-Frame.Name = "MainFrame"
+Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Fundo Preto
+Frame.Size = UDim2.new(0, 500, 0, 180)
+Frame.Position = UDim2.new(0.5, -250, 0.5, -90)
 Frame.Parent = ScreenGui
-Frame.BackgroundColor3 = Color3.fromRGB(255, 182, 193) -- Theme color
-Frame.Position = UDim2.new(0.5, -150, 0.5, -100)
-Frame.Size = UDim2.new(0, 300, 0, 200)
 
--- Creating tabs
-local TrollTab = Instance.new("TextButton")
-local PlayerTab = Instance.new("TextButton")
-local OthersTab = Instance.new("TextButton")
+-- Borda Rosa Claro
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Thickness = 4
+UIStroke.Color = Color3.fromRGB(255, 182, 193) -- Rosa Claro
+UIStroke.Parent = Frame
 
-TrollTab.Name = "TrollTab"
+-- Mensagem Inicial dentro da Interface
+local InitialMessage = Instance.new("TextLabel")
+InitialMessage.Parent = Frame
+InitialMessage.Text = "Emilli❤️"
+InitialMessage.Size = UDim2.new(1, 0, 1, 0)
+InitialMessage.TextColor3 = Color3.fromRGB(255, 182, 193) -- Rosa Claro
+InitialMessage.BackgroundTransparency = 1
+InitialMessage.Font = Enum.Font.GothamBlack
+InitialMessage.TextScaled = true-- Criando abas
+local TrollTab = Instance.new("Frame")
+local PlayerTab = Instance.new("Frame")
+local OthersTab = Instance.new("Frame")
+
 TrollTab.Parent = Frame
-TrollTab.Text = "Troll"
-TrollTab.Size = UDim2.new(0, 80, 0, 30)
-TrollTab.Position = UDim2.new(0, 10, 0, 10)
+TrollTab.Size = UDim2.new(1, -80, 1, -50)
+TrollTab.Position = UDim2.new(0, 80, 0, 50)
+TrollTab.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+TrollTab.Visible = false
 
-PlayerTab.Name = "PlayerTab"
 PlayerTab.Parent = Frame
-PlayerTab.Text = "Player"
-PlayerTab.Size = UDim2.new(0, 80, 0, 30)
-PlayerTab.Position = UDim2.new(0, 100, 0, 10)
+PlayerTab.Size = UDim2.new(1, -80, 1, -50)
+PlayerTab.Position = UDim2.new(0, 80, 0, 50)
+PlayerTab.BackgroundColor3 = Color3.fromRGB(100, 255, 100)
+PlayerTab.Visible = false
 
-OthersTab.Name = "OthersTab"
 OthersTab.Parent = Frame
-OthersTab.Text = "Others"
-OthersTab.Size = UDim2.new(0, 80, 0, 30)
-OthersTab.Position = UDim2.new(0, 190, 0, 10)
+OthersTab.Size = UDim2.new(1, -80, 1, -50)
+OthersTab.Position = UDim2.new(0, 80, 0, 50)
+OthersTab.BackgroundColor3 = Color3.fromRGB(100, 100, 255)
+OthersTab.Visible = false
 
--- Function to create "Back" buttons
-local function createBackButton(parent)
-    local BackButton = Instance.new("TextButton")
-    BackButton.Parent = parent
-    BackButton.Text = "Back"
-    BackButton.Size = UDim2.new(0, 80, 0, 30)
-    BackButton.Position = UDim2.new(1, -90, 1, -40)
-    BackButton.MouseButton1Click:Connect(function()
-        parent.Visible = false
-        Frame.Visible = true
-    end)
+-- Alternância entre abas
+local function ShowTab(tab)
+    InitialMessage.Visible = false -- Remove a mensagem inicial ao clicar em uma aba
+    TrollTab.Visible = false
+    PlayerTab.Visible = false
+    OthersTab.Visible = false
+    tab.Visible = true
 end
 
--- Creating the Troll tab with features
-local TrollFrame = Instance.new("Frame")
-TrollFrame.Parent = ScreenGui
-TrollFrame.Size = UDim2.new(0, 300, 0, 250)
-TrollFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
-TrollFrame.Visible = false
+local TrollButton = Instance.new("TextButton")
+TrollButton.Parent = Tabs
+TrollButton.Text = "Troll"
+TrollButton.Size = UDim2.new(1, 0, 0.2, 0)
+TrollButton.MouseButton1Click:Connect(function() ShowTab(TrollTab) end)
 
-local PlayerNameInput = Instance.new("TextBox")
-PlayerNameInput.Parent = TrollFrame
-PlayerNameInput.PlaceholderText = "Enter Player Name"
-PlayerNameInput.Size = UDim2.new(0, 260, 0, 30)
-PlayerNameInput.Position = UDim2.new(0, 10, 0, 10)
+local PlayerButton = Instance.new("TextButton")
+PlayerButton.Parent = Tabs
+PlayerButton.Text = "Player"
+PlayerButton.Size = UDim2.new(1, 0, 0.2, 0)
+PlayerButton.MouseButton1Click:Connect(function() ShowTab(PlayerTab) end)
 
-local VoidPlayerButton = Instance.new("TextButton")
-VoidPlayerButton.Parent = TrollFrame
-VoidPlayerButton.Text = "Void Player"
-VoidPlayerButton.Size = UDim2.new(0, 120, 0, 30)
-VoidPlayerButton.Position = UDim2.new(0, 10, 0, 50)
+local OthersButton = Instance.new("TextButton")
+OthersButton.Parent = Tabs
+OthersButton.Text = "Others"
+OthersButton.Size = UDim2.new(1, 0, 0.2, 0)
+OthersButton.MouseButton1Click:Connect(function() ShowTab(OthersTab) end)-- Criando barra de entrada de nome dentro da aba Troll
+local InputBox = Instance.new("TextBox")
+InputBox.Parent = TrollTab
+InputBox.Size = UDim2.new(0, 200, 0, 30)
+InputBox.Position = UDim2.new(0.5, -100, 0.1, 0)
+InputBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+InputBox.Text = "Digite o nome do jogador"
 
-local ViewPlayerButton = Instance.new("TextButton")
-ViewPlayerButton.Parent = TrollFrame
-ViewPlayerButton.Text = "View Player"
-ViewPlayerButton.Size = UDim2.new(0, 120, 0, 30)
-ViewPlayerButton.Position = UDim2.new(0, 140, 0, 50)
+-- Botões para Void Player e View dentro da aba Troll
+local VoidButton = Instance.new("TextButton")
+VoidButton.Parent = TrollTab
+VoidButton.Size = UDim2.new(0, 100, 0, 30)
+VoidButton.Position = UDim2.new(0.5, -50, 0.25, 0)
+VoidButton.Text = "Void Player"
 
-local CopySkinButton = Instance.new("TextButton")
-CopySkinButton.Parent = TrollFrame
-CopySkinButton.Text = "Copy Skin"
-CopySkinButton.Size = UDim2.new(0, 120, 0, 30)
-CopySkinButton.Position = UDim2.new(0, 10, 0, 90)
-
-createBackButton(TrollFrame)
-
--- Void Player Function
-local function teleportToVoid(playerName)
+VoidButton.MouseButton1Click:Connect(function()
+    local playerName = InputBox.Text
     local targetPlayer = game.Players:FindFirstChild(playerName)
-    if targetPlayer and targetPlayer.Character then
-        local humanoidRootPart = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
-        if humanoidRootPart then
-            humanoidRootPart.Position = Vector3.new(0, -500, 0)
-        end
-    end
-end
-
-VoidPlayerButton.MouseButton1Click:Connect(function()
-    teleportToVoid(PlayerNameInput.Text)
-end)
-
--- View Player Function
-ViewPlayerButton.MouseButton1Click:Connect(function()
-    local targetPlayer = game.Players:FindFirstChild(PlayerNameInput.Text)
-    if targetPlayer and targetPlayer.Character then
-        workspace.CurrentCamera.CameraSubject = targetPlayer.Character.HumanoidRootPart
+    if targetPlayer then
+        targetPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(Vector3.new(9999, 9999, 9999))
     end
 end)
 
--- Creating the Others tab with Fly and Music
-local OthersFrame = Instance.new("Frame")
-OthersFrame.Parent = ScreenGui
-OthersFrame.Size = UDim2.new(0, 300, 0, 250)
-OthersFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
-OthersFrame.Visible = false
+local ViewOnButton = Instance.new("TextButton")
+ViewOnButton.Parent = TrollTab
+ViewOnButton.Size = UDim2.new(0, 100, 0, 30)
+ViewOnButton.Position = UDim2.new(0.5, -50, 0.4, 0)
+ViewOnButton.Text = "View ON"
 
-local FlyActivateButton = Instance.new("TextButton")
-FlyActivateButton.Parent = OthersFrame
-FlyActivateButton.Text = "Activate Fly"
-FlyActivateButton.Size = UDim2.new(0, 120, 0, 30)
-FlyActivateButton.Position = UDim2.new(0, 10, 0, 10)
+local ViewOffButton = Instance.new("TextButton")
+ViewOffButton.Parent = TrollTab
+ViewOffButton.Size = UDim2.new(0, 100, 0, 30)
+ViewOffButton.Position = UDim2.new(0.5, -50, 0.55, 0)
+ViewOffButton.Text = "View OFF"
 
-local MusicIdInput = Instance.new("TextBox")
-MusicIdInput.Parent = OthersFrame
-MusicIdInput.PlaceholderText = "Enter Music ID"
-MusicIdInput.Size = UDim2.new(0, 260, 0, 30)
-MusicIdInput.Position = UDim2.new(0, 10, 0, 50)
+ViewOnButton.MouseButton1Click:Connect(function()
+    local playerName = InputBox.Text
+    local targetPlayer = game.Players:FindFirstChild(playerName)
+    if targetPlayer then
+        game.Workspace.CurrentCamera.CameraSubject = targetPlayer.Character.Humanoid
+    end
+end)
 
-local PlayMusicButton = Instance.new("TextButton")
-PlayMusicButton.Parent = OthersFrame
-PlayMusicButton.Text = "Play Music"
-PlayMusicButton.Size = UDim2.new(0, 120, 0, 30)
-PlayMusicButton.Position = UDim2.new(0, 10, 0, 90)
-
-createBackButton(OthersFrame)
-
--- Implementing Fly
-FlyActivateButton.MouseButton1Click:Connect(function()
-    local player = game.Players.LocalPlayer
-    local character = player.Character or player.CharacterAdded:Wait()
-    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-
-    local flyPart = Instance.new("BodyVelocity")
-    flyPart.Velocity = Vector3.new(0, 50, 0)
-    flyPart.MaxForce = Vector3.new(4000, 4000, 4000)
-    flyPart.Parent = humanoidRootPart
+ViewOffButton.MouseButton1Click:Connect(function()
+    game.Workspace.CurrentCamera.CameraSubject = game.Players.LocalPlayer.Character.Humanoid
 end)
