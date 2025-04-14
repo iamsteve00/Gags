@@ -16,6 +16,24 @@ local function ShowWelcomeMessage()
     WelcomeScreen:Destroy()
 end
 
+ShowWelcomeMessage()local function ShowWelcomeMessage()
+    local WelcomeScreen = Instance.new("ScreenGui")
+    local WelcomeLabel = Instance.new("TextLabel")
+
+    WelcomeScreen.Parent = game.CoreGui
+
+    WelcomeLabel.Parent = WelcomeScreen
+    WelcomeLabel.Text = "Bem-vindo ao Emilli Hub!"
+    WelcomeLabel.Size = UDim2.new(1, 0, 1, 0)
+    WelcomeLabel.TextScaled = true
+    WelcomeLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    WelcomeLabel.TextColor3 = Color3.fromRGB(255, 182, 193) -- Rosa Claro
+
+    wait(2) -- Aguarda 2 segundos antes de carregar a interface
+
+    WelcomeScreen:Destroy()
+end
+
 ShowWelcomeMessage()local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
