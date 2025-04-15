@@ -1,117 +1,163 @@
-local ChaosHub = loadstring(game:HttpGet("https://pastebin.com/raw/6ZeQgsmw"))()
+-- Emilli Hub com sistema de minimizar + barra de nome para Kill Player
 
--- Funções aprimoradas do SanderX
-local function SanderXFeatures()
-    -- Teleporte para locais específicos
-    local locations = {
-        Bank = Vector3.new(0, 10, 0),
-        Hospital = Vector3.new(50, 10, 100),
-        PoliceStation = Vector3.new(-100, 10, 200),
-    }
-    local function TeleportTo(place)
-        if locations[place] then
-            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(locations[place])
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local EmilliHub = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
+EmilliHub.Name = "EmilliHub"
+EmilliHub.ResetOnSpawn = false
+
+-- Main Frame
+local MainFrame = Instance.new("Frame", EmilliHub)
+MainFrame.Size = UDim2.new(0, 750, 0, 420)
+MainFrame.Position = UDim2.new(0.5, -375, 0.5, -210)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.BorderSizePixel = 0
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
+
+-- Título
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Size = UDim2.new(1, -40, 0, 40)
+Title.Position = UDim2.new(0, 10, 0, 0)
+Title.Text = "Brookhaven RP | Português"
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 18
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.BackgroundTransparency = 1
+Title.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Botões de fechar e minimizar
+local CloseBtn = Instance.new("TextButton", MainFrame)
+CloseBtn.Size = UDim2.new(0, 30, 0, 30)
+CloseBtn.Position = UDim2.new(1, -35, 0, 5)
+CloseBtn.Text = "X"
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.TextSize = 14
+CloseBtn.BackgroundColor3 = Color3.fromRGB(40, 0, 0)
+CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.MouseButton1Click:Connect(function()
+    EmilliHub:Destroy()
+end)
+
+local MinimizeBtn = Instance.new("TextButton", MainFrame)
+MinimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+MinimizeBtn.Position = UDim2.new(1, -70, 0, 5)
+MinimizeBtn.Text = "-"
+MinimizeBtn.Font = Enum.Font.GothamBold
+MinimizeBtn.TextSize = 14
+MinimizeBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MinimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+local minimized = false
+local originalSize = MainFrame.Size
+local originalPosition = MainFrame.Position
+
+local function makeDraggable(gui)
+    local dragging, dragInput, dragStart, startPos
+
+    gui.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = gui.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
         end
-    end
+    end)
 
-    -- Veículos turbo
-    for _,v in pairs(game.Workspace:GetChildren()) do
-        if v:IsA("VehicleSeat") then
-            v.MaxSpeed = 500
+    gui.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            dragInput = input
         end
-    end
+    end)
 
-    -- Invisibilidade temporária
-    game.Players.LocalPlayer.Character.Head.Transparency = 1
-    game.Players.LocalPlayer.Character.HumanoidRootPart.Transparency = 1
-
-    -- Super pulo
-    game.Players.LocalPlayer.Character.Humanoid.JumpPower = 100
+    game:GetService("UserInputService").InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
 end
 
--- Funções aprimoradas do Rael Hub
-local function RaelHubFeatures()
-    -- ESP para visualizar jogadores e veículos
-    for _,v in pairs(game.Players:GetPlayers()) do
-        if v.Character then
-            local highlight = Instance.new("Highlight")
-            highlight.Parent = v.Character
-            highlight.FillColor = Color3.fromRGB(255, 0, 0)
-            highlight.FillTransparency = 0.5
-        end
-    end
-
-    -- Fly Mode
-    local function EnableFly()
-        local player = game.Players.LocalPlayer
-        local character = player.Character or player.CharacterAdded:Wait()
-        local humanoid = character:FindFirstChildOfClass("Humanoid")
-        if humanoid then
-            humanoid:SetStateEnabled(Enum.HumanoidStateType.Flying, true)
-        end
-    end
-
-    -- God Mode
-    local function EnableGodMode()
-        local player = game.Players.LocalPlayer
-        local character = player.Character or player.CharacterAdded:Wait()
-        for _, part in pairs(character:GetChildren()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = false
-                part.Anchored = true
+MinimizeBtn.MouseButton1Click:Connect(function()
+    if not minimized then
+        for _, frame in pairs(MainFrame:GetChildren()) do
+            if frame:IsA("Frame") or frame:IsA("TextLabel") or frame:IsA("ScrollingFrame") then
+                frame.Visible = false
             end
         end
-    end
+        MainFrame.Size = UDim2.new(0, 60, 0, 60)
+        MainFrame.Position = UDim2.new(0, 20, 0, 100)
+        MinimizeBtn.Visible = false
+        CloseBtn.Visible = false
+        Title.Visible = false
+        minimized = true
 
-    -- Speed Boost
-    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 100
+        local RestoreBtn = Instance.new("TextButton", MainFrame)
+        RestoreBtn.Name = "RestoreBtn"
+        RestoreBtn.Size = UDim2.new(1, 0, 1, 0)
+        RestoreBtn.Position = UDim2.new(0, 0, 0, 0)
+        RestoreBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        RestoreBtn.Text = "Abrir"
+        RestoreBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        RestoreBtn.Font = Enum.Font.GothamBold
+        RestoreBtn.TextSize = 14
 
-    -- Unban Feature (tentativa de reentrada)
-    local function Unban()
-        game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
-    end
+        makeDraggable(MainFrame)
 
-    -- Executando funções
-    task.spawn(EnableFly)
-    task.spawn(EnableGodMode)
-    task.spawn(Unban)
-end
-
--- Funções aprimoradas do Chaos Hub
-local function ChaosHubFeatures()
-    -- Admin Menu (exemplo básico)
-    local function OpenAdminMenu()
-        print("Admin Menu Ativado!") -- Aqui pode ser expandido para abrir um GUI real
-    end
-
-    -- Kill All (exemplo de função ofensiva)
-    local function KillAll()
-        for _, player in pairs(game.Players:GetPlayers()) do
-            if player.Character and player ~= game.Players.LocalPlayer then
-                player.Character:BreakJoints()
+        RestoreBtn.MouseButton1Click:Connect(function()
+            RestoreBtn:Destroy()
+            MainFrame.Size = originalSize
+            MainFrame.Position = originalPosition
+            for _, frame in pairs(MainFrame:GetChildren()) do
+                if frame:IsA("Frame") or frame:IsA("TextLabel") or frame:IsA("ScrollingFrame") then
+                    frame.Visible = true
+                end
             end
-        end
+            MinimizeBtn.Visible = true
+            CloseBtn.Visible = true
+            Title.Visible = true
+            minimized = false
+        end)
     end
+end)
 
-    -- Gamepass Grátis
-    local function FreeGamepass()
-        local player = game.Players.LocalPlayer
-        local backpack = player:FindFirstChild("Backpack")
-        if backpack then
-            local gamepassItem = Instance.new("Tool")
-            gamepassItem.Parent = backpack
-            gamepassItem.Name = "Gamepass Exclusivo"
-        end
+-- Exemplo de aba com Kill Player + barra de input
+local AbaKillPlayer = Instance.new("Frame", MainFrame)
+AbaKillPlayer.Size = UDim2.new(0, 250, 0, 150)
+AbaKillPlayer.Position = UDim2.new(0, 120, 0, 50)
+AbaKillPlayer.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Instance.new("UICorner", AbaKillPlayer).CornerRadius = UDim.new(0, 6)
+
+local PlayerNameBox = Instance.new("TextBox", AbaKillPlayer)
+PlayerNameBox.Size = UDim2.new(0, 200, 0, 30)
+PlayerNameBox.Position = UDim2.new(0, 10, 0, 10)
+PlayerNameBox.PlaceholderText = "Nome do jogador"
+PlayerNameBox.Font = Enum.Font.Gotham
+PlayerNameBox.TextSize = 14
+PlayerNameBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+PlayerNameBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+PlayerNameBox.ClearTextOnFocus = false
+
+local KillBtn = Instance.new("TextButton", AbaKillPlayer)
+KillBtn.Size = UDim2.new(0, 200, 0, 30)
+KillBtn.Position = UDim2.new(0, 10, 0, 50)
+KillBtn.Text = "Kill Player"
+KillBtn.Font = Enum.Font.GothamBold
+KillBtn.TextSize = 14
+KillBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+KillBtn.BackgroundColor3 = Color3.fromRGB(80, 0, 0)
+
+KillBtn.MouseButton1Click:Connect(function()
+    local name = PlayerNameBox.Text
+    local target = game.Players:FindFirstChild(name)
+    if target and target.Character and target.Character:FindFirstChild("Humanoid") then
+        target.Character.Humanoid.Health = 0
     end
+end)
 
-    -- Executando funções
-    task.spawn(OpenAdminMenu)
-    task.spawn(KillAll)
-    task.spawn(FreeGamepass)
-end
-
--- Inicializando Chaos Hub e adicionando funções únicas dos outros scripts
-ChaosHub()
-task.spawn(SanderXFeatures)
-task.spawn(RaelHubFeatures)
-task.spawn(ChaosHubFeatures)
+-- Aqui continua a construção das outras abas e funcionalidades...
