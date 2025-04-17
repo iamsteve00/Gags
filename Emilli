@@ -1,163 +1,153 @@
--- Emilli Hub com sistema de minimizar + barra de nome para Kill Player
+-- Emilli Hub - Parte 3 (Aba Visual) -- Interface baseada no Chaos Hub com layout lateral e abas com ícones
 
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
+local Players = game:GetService("Players") local Player = Players.LocalPlayer local PlayerGui = Player:WaitForChild("PlayerGui")
 
-local EmilliHub = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
-EmilliHub.Name = "EmilliHub"
-EmilliHub.ResetOnSpawn = false
+local EmilliHub = Instance.new("ScreenGui") EmilliHub.Name = "EmilliHub" EmilliHub.ResetOnSpawn = false EmilliHub.Parent = PlayerGui
 
--- Main Frame
-local MainFrame = Instance.new("Frame", EmilliHub)
-MainFrame.Size = UDim2.new(0, 750, 0, 420)
-MainFrame.Position = UDim2.new(0.5, -375, 0.5, -210)
-MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-MainFrame.BorderSizePixel = 0
-Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
+local TweenService = game:GetService("TweenService")
 
--- Título
-local Title = Instance.new("TextLabel", MainFrame)
-Title.Size = UDim2.new(1, -40, 0, 40)
-Title.Position = UDim2.new(0, 10, 0, 0)
-Title.Text = "Brookhaven RP | Português"
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = 18
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.BackgroundTransparency = 1
-Title.TextXAlignment = Enum.TextXAlignment.Left
+-- Container principal local MainFrame = Instance.new("Frame") MainFrame.Name = "MainFrame" MainFrame.Size = UDim2.new(0, 500, 0, 350) MainFrame.Position = UDim2.new(0.5, -250, 0.5, -175) MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25) MainFrame.BorderSizePixel = 0 MainFrame.Visible = false MainFrame.Parent = EmilliHub
 
--- Botões de fechar e minimizar
-local CloseBtn = Instance.new("TextButton", MainFrame)
-CloseBtn.Size = UDim2.new(0, 30, 0, 30)
-CloseBtn.Position = UDim2.new(1, -35, 0, 5)
-CloseBtn.Text = "X"
-CloseBtn.Font = Enum.Font.GothamBold
-CloseBtn.TextSize = 14
-CloseBtn.BackgroundColor3 = Color3.fromRGB(40, 0, 0)
-CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseBtn.MouseButton1Click:Connect(function()
-    EmilliHub:Destroy()
+-- UICorner para bordas arredondadas local MainCorner = Instance.new("UICorner") MainCorner.CornerRadius = UDim.new(0, 12) MainCorner.Parent = MainFrame
+
+-- Fade-in da interface após mensagem de boas-vindas wait(2.5) MainFrame.Visible = true TweenService:Create(MainFrame, TweenInfo.new(1), {BackgroundTransparency = 0}):Play()
+
+-- Container de abas laterais local Sidebar = Instance.new("Frame") Sidebar.Name = "Sidebar" Sidebar.Size = UDim2.new(0, 60, 1, 0) Sidebar.Position = UDim2.new(0, 0, 0, 0) Sidebar.BackgroundColor3 = Color3.fromRGB(15, 15, 15) Sidebar.BorderSizePixel = 0 Sidebar.Parent = MainFrame
+
+local SidebarCorner = Instance.new("UICorner") SidebarCorner.CornerRadius = UDim.new(0, 12) SidebarCorner.Parent = Sidebar
+
+-- Título local Title = Instance.new("TextLabel") Title.Name = "Title" Title.Size = UDim2.new(1, 0, 0, 30) Title.Position = UDim2.new(0, 60, 0, 0) Title.BackgroundColor3 = Color3.fromRGB(35, 35, 35) Title.Text = "Brookhaven RP | Português" Title.TextColor3 = Color3.fromRGB(255, 255, 255) Title.TextScaled = true Title.Font = Enum.Font.GothamBold Title.Parent = MainFrame
+
+-- Conteúdo das abas local TabContent = Instance.new("Frame") TabContent.Name = "TabContent" TabContent.Size = UDim2.new(1, -60, 1, -30) TabContent.Position = UDim2.new(0, 60, 0, 30) TabContent.BackgroundTransparency = 1 TabContent.Parent = MainFrame
+
+-- Função para criar abas local function CreateTab(name, iconId, callback) local button = Instance.new("ImageButton") button.Size = UDim2.new(1, -10, 0, 50) button.Position = UDim2.new(0, 5, 0, #Sidebar:GetChildren() * 52) button.BackgroundTransparency = 1 button.Image = iconId button.Name = name button.Parent = Sidebar
+
+button.MouseButton1Click:Connect(function()
+    for _, child in ipairs(TabContent:GetChildren()) do
+        if child:IsA("Frame") then
+            child.Visible = false
+        end
+    end
+    callback()
 end)
 
-local MinimizeBtn = Instance.new("TextButton", MainFrame)
-MinimizeBtn.Size = UDim2.new(0, 30, 0, 30)
-MinimizeBtn.Position = UDim2.new(1, -70, 0, 5)
-MinimizeBtn.Text = "-"
-MinimizeBtn.Font = Enum.Font.GothamBold
-MinimizeBtn.TextSize = 14
-MinimizeBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-MinimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-
-local minimized = false
-local originalSize = MainFrame.Size
-local originalPosition = MainFrame.Position
-
-local function makeDraggable(gui)
-    local dragging, dragInput, dragStart, startPos
-
-    gui.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            startPos = gui.Position
-
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
-    end)
-
-    gui.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement then
-            dragInput = input
-        end
-    end)
-
-    game:GetService("UserInputService").InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
-            local delta = input.Position - dragStart
-            gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
-    end)
 end
 
-MinimizeBtn.MouseButton1Click:Connect(function()
-    if not minimized then
-        for _, frame in pairs(MainFrame:GetChildren()) do
-            if frame:IsA("Frame") or frame:IsA("TextLabel") or frame:IsA("ScrollingFrame") then
-                frame.Visible = false
-            end
+-- Função para criar conteúdo da aba Visual local function VisualTab() local tab = Instance.new("Frame") tab.Name = "VisualTab" tab.Size = UDim2.new(1, 0, 1, 0) tab.BackgroundTransparency = 1 tab.Visible = true tab.Parent = TabContent
+
+local Scroll = Instance.new("ScrollingFrame")
+Scroll.Size = UDim2.new(1, 0, 1, 0)
+Scroll.CanvasSize = UDim2.new(0, 0, 2, 0)
+Scroll.ScrollBarThickness = 4
+Scroll.BackgroundTransparency = 1
+Scroll.Parent = tab
+
+local UIList = Instance.new("UIListLayout")
+UIList.Padding = UDim.new(0, 5)
+UIList.SortOrder = Enum.SortOrder.LayoutOrder
+UIList.Parent = Scroll
+
+-- Criar botão de ESP
+local function CreateButton(name, callback)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -10, 0, 40)
+    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    btn.Text = name
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.Gotham
+    btn.TextScaled = true
+    btn.Parent = Scroll
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = btn
+
+    btn.MouseButton1Click:Connect(callback)
+end
+
+CreateButton("ESP Jogadores", function()
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= Player and not plr.Character:FindFirstChild("ESP") then
+            local esp = Instance.new("BillboardGui")
+            esp.Name = "ESP"
+            esp.Adornee = plr.Character:FindFirstChild("Head")
+            esp.Size = UDim2.new(0, 100, 0, 40)
+            esp.AlwaysOnTop = true
+            esp.Parent = plr.Character
+
+            local label = Instance.new("TextLabel")
+            label.Size = UDim2.new(1, 0, 1, 0)
+            label.BackgroundTransparency = 1
+            label.Text = plr.Name
+            label.TextColor3 = Color3.fromRGB(255, 0, 0)
+            label.TextScaled = true
+            label.Font = Enum.Font.GothamBold
+            label.Parent = esp
         end
-        MainFrame.Size = UDim2.new(0, 60, 0, 60)
-        MainFrame.Position = UDim2.new(0, 20, 0, 100)
-        MinimizeBtn.Visible = false
-        CloseBtn.Visible = false
-        Title.Visible = false
-        minimized = true
-
-        local RestoreBtn = Instance.new("TextButton", MainFrame)
-        RestoreBtn.Name = "RestoreBtn"
-        RestoreBtn.Size = UDim2.new(1, 0, 1, 0)
-        RestoreBtn.Position = UDim2.new(0, 0, 0, 0)
-        RestoreBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-        RestoreBtn.Text = "Abrir"
-        RestoreBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        RestoreBtn.Font = Enum.Font.GothamBold
-        RestoreBtn.TextSize = 14
-
-        makeDraggable(MainFrame)
-
-        RestoreBtn.MouseButton1Click:Connect(function()
-            RestoreBtn:Destroy()
-            MainFrame.Size = originalSize
-            MainFrame.Position = originalPosition
-            for _, frame in pairs(MainFrame:GetChildren()) do
-                if frame:IsA("Frame") or frame:IsA("TextLabel") or frame:IsA("ScrollingFrame") then
-                    frame.Visible = true
-                end
-            end
-            MinimizeBtn.Visible = true
-            CloseBtn.Visible = true
-            Title.Visible = true
-            minimized = false
-        end)
     end
 end)
 
--- Exemplo de aba com Kill Player + barra de input
-local AbaKillPlayer = Instance.new("Frame", MainFrame)
-AbaKillPlayer.Size = UDim2.new(0, 250, 0, 150)
-AbaKillPlayer.Position = UDim2.new(0, 120, 0, 50)
-AbaKillPlayer.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-Instance.new("UICorner", AbaKillPlayer).CornerRadius = UDim.new(0, 6)
-
-local PlayerNameBox = Instance.new("TextBox", AbaKillPlayer)
-PlayerNameBox.Size = UDim2.new(0, 200, 0, 30)
-PlayerNameBox.Position = UDim2.new(0, 10, 0, 10)
-PlayerNameBox.PlaceholderText = "Nome do jogador"
-PlayerNameBox.Font = Enum.Font.Gotham
-PlayerNameBox.TextSize = 14
-PlayerNameBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-PlayerNameBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-PlayerNameBox.ClearTextOnFocus = false
-
-local KillBtn = Instance.new("TextButton", AbaKillPlayer)
-KillBtn.Size = UDim2.new(0, 200, 0, 30)
-KillBtn.Position = UDim2.new(0, 10, 0, 50)
-KillBtn.Text = "Kill Player"
-KillBtn.Font = Enum.Font.GothamBold
-KillBtn.TextSize = 14
-KillBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-KillBtn.BackgroundColor3 = Color3.fromRGB(80, 0, 0)
-
-KillBtn.MouseButton1Click:Connect(function()
-    local name = PlayerNameBox.Text
-    local target = game.Players:FindFirstChild(name)
-    if target and target.Character and target.Character:FindFirstChild("Humanoid") then
-        target.Character.Humanoid.Health = 0
+CreateButton("Remover ESP", function()
+    for _, plr in pairs(Players:GetPlayers()) do
+        local esp = plr.Character:FindFirstChild("ESP")
+        if esp then
+            esp:Destroy()
+        end
     end
 end)
 
--- Aqui continua a construção das outras abas e funcionalidades...
+end
+
+-- Adicionar aba Visual com ícone CreateTab("Visual", "rbxassetid://6031091009", VisualTab)
+
+-- Aba Admin
+local adminTab = createTab("Admin", "rbxassetid://12345679") -- Ícone fictício
+
+-- Kick Player (Input)
+createTextBox(adminTab, "Kick Jogador", "Nome do jogador", function(playerName)
+    local Players = game:GetService("Players")
+    local target = Players:FindFirstChild(playerName)
+    if target then
+        target:Kick("Você foi kickado pelo Emilli Hub!")
+    end
+end)
+
+-- Respawnar personagem
+createButton(adminTab, "Respawnar", function()
+    local plr = game.Players.LocalPlayer
+    if plr.Character then
+        plr.Character:BreakJoints()
+    end
+end)
+
+-- Recarregar personagem
+createButton(adminTab, "Recarregar", function()
+    local plr = game.Players.LocalPlayer
+    if plr.Character then
+        local pos = plr.Character.HumanoidRootPart.Position
+        plr:LoadCharacter()
+        task.wait(1)
+        if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            plr.Character:MoveTo(pos)
+        end
+    end
+end)
+
+-- Resetar câmera
+createButton(adminTab, "Resetar Câmera", function()
+    local cam = workspace.CurrentCamera
+    cam.CameraSubject = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
+end)
+
+-- Restaurar velocidade
+createButton(adminTab, "Velocidade Padrão", function()
+    local char = game.Players.LocalPlayer.Character
+    if char and char:FindFirstChild("Humanoid") then
+        char.Humanoid.WalkSpeed = 16
+    end
+end)
+
+-- Restaurar gravidade
+createButton(adminTab, "Gravidade Padrão", function()
+    workspace.Gravity = 196.2
+end)
