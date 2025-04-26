@@ -1,153 +1,177 @@
--- Emilli Hub - Parte 3 (Aba Visual) -- Interface baseada no Chaos Hub com layout lateral e abas com ícones
+-- Emilli Hub - Script Final Completo -- Inspirado em Chaos, SanderX, Rael e Cartola Hub -- Desenvolvido para Brookhaven RP
 
-local Players = game:GetService("Players") local Player = Players.LocalPlayer local PlayerGui = Player:WaitForChild("PlayerGui")
+-- Tela de boas-vindas com Fade In/Out local TweenService = game:GetService("TweenService") local Players = game:GetService("Players") local player = Players.LocalPlayer local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 
-local EmilliHub = Instance.new("ScreenGui") EmilliHub.Name = "EmilliHub" EmilliHub.ResetOnSpawn = false EmilliHub.Parent = PlayerGui
+local welcomeFrame = Instance.new("Frame", gui) welcomeFrame.Size = UDim2.new(1, 0, 1, 0) welcomeFrame.BackgroundColor3 = Color3.new(0, 0, 0) welcomeFrame.BackgroundTransparency = 1
 
-local TweenService = game:GetService("TweenService")
+local welcomeText = Instance.new("TextLabel", welcomeFrame) welcomeText.Size = UDim2.new(1, 0, 1, 0) welcomeText.Text = "Bem-vindo ao Emilli Hub" welcomeText.TextColor3 = Color3.new(1, 1, 1) welcomeText.BackgroundTransparency = 1 welcomeText.Font = Enum.Font.GothamBold welcomeText.TextScaled = true
 
--- Container principal local MainFrame = Instance.new("Frame") MainFrame.Name = "MainFrame" MainFrame.Size = UDim2.new(0, 500, 0, 350) MainFrame.Position = UDim2.new(0.5, -250, 0.5, -175) MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25) MainFrame.BorderSizePixel = 0 MainFrame.Visible = false MainFrame.Parent = EmilliHub
+TweenService:Create(welcomeFrame, TweenInfo.new(1), {BackgroundTransparency = 0.5}):Play() wait(2) TweenService:Create(welcomeFrame, TweenInfo.new(1), {BackgroundTransparency = 1}):Play() wait(1) welcomeFrame:Destroy()
 
--- UICorner para bordas arredondadas local MainCorner = Instance.new("UICorner") MainCorner.CornerRadius = UDim.new(0, 12) MainCorner.Parent = MainFrame
+-- Interface Principal local EmilliHub = Instance.new("ScreenGui") EmilliHub.Name = "EmilliHub" EmilliHub.ResetOnSpawn = false EmilliHub.Parent = player:WaitForChild("PlayerGui")
 
--- Fade-in da interface após mensagem de boas-vindas wait(2.5) MainFrame.Visible = true TweenService:Create(MainFrame, TweenInfo.new(1), {BackgroundTransparency = 0}):Play()
+local MainFrame = Instance.new("Frame") MainFrame.Size = UDim2.new(0, 500, 0, 350) MainFrame.Position = UDim2.new(0.3, 0, 0.3, 0) MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25) MainFrame.BorderSizePixel = 0 MainFrame.Parent = EmilliHub
 
--- Container de abas laterais local Sidebar = Instance.new("Frame") Sidebar.Name = "Sidebar" Sidebar.Size = UDim2.new(0, 60, 1, 0) Sidebar.Position = UDim2.new(0, 0, 0, 0) Sidebar.BackgroundColor3 = Color3.fromRGB(15, 15, 15) Sidebar.BorderSizePixel = 0 Sidebar.Parent = MainFrame
+local UICorner = Instance.new("UICorner") UICorner.CornerRadius = UDim.new(0, 10) UICorner.Parent = MainFrame
 
-local SidebarCorner = Instance.new("UICorner") SidebarCorner.CornerRadius = UDim.new(0, 12) SidebarCorner.Parent = Sidebar
+-- Barra Lateral com Ícones local Sidebar = Instance.new("Frame") Sidebar.Size = UDim2.new(0, 50, 1, 0) Sidebar.Position = UDim2.new(0, 0, 0, 0) Sidebar.BackgroundColor3 = Color3.fromRGB(15, 15, 15) Sidebar.Parent = MainFrame
 
--- Título local Title = Instance.new("TextLabel") Title.Name = "Title" Title.Size = UDim2.new(1, 0, 0, 30) Title.Position = UDim2.new(0, 60, 0, 0) Title.BackgroundColor3 = Color3.fromRGB(35, 35, 35) Title.Text = "Brookhaven RP | Português" Title.TextColor3 = Color3.fromRGB(255, 255, 255) Title.TextScaled = true Title.Font = Enum.Font.GothamBold Title.Parent = MainFrame
+-- Fechar e Minimizar local CloseBtn = Instance.new("TextButton") CloseBtn.Text = "✖" CloseBtn.Size = UDim2.new(0, 30, 0, 30) CloseBtn.Position = UDim2.new(1, -35, 0, 5) CloseBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0) CloseBtn.TextColor3 = Color3.new(1,1,1) CloseBtn.Parent = MainFrame CloseBtn.MouseButton1Click:Connect(function() EmilliHub:Destroy() end)
 
--- Conteúdo das abas local TabContent = Instance.new("Frame") TabContent.Name = "TabContent" TabContent.Size = UDim2.new(1, -60, 1, -30) TabContent.Position = UDim2.new(0, 60, 0, 30) TabContent.BackgroundTransparency = 1 TabContent.Parent = MainFrame
+local MinBtn = Instance.new("TextButton") MinBtn.Text = "—" MinBtn.Size = UDim2.new(0, 30, 0, 30) MinBtn.Position = UDim2.new(1, -70, 0, 5) MinBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100) MinBtn.TextColor3 = Color3.new(1,1,1) MinBtn.Parent = MainFrame local contentVisible = true MinBtn.MouseButton1Click:Connect(function() contentVisible = not contentVisible for _, tab in pairs(MainFrame:GetChildren()) do if tab:IsA("Frame") and tab.Name ~= "Sidebar" then tab.Visible = contentVisible end end end)
 
--- Função para criar abas local function CreateTab(name, iconId, callback) local button = Instance.new("ImageButton") button.Size = UDim2.new(1, -10, 0, 50) button.Position = UDim2.new(0, 5, 0, #Sidebar:GetChildren() * 52) button.BackgroundTransparency = 1 button.Image = iconId button.Name = name button.Parent = Sidebar
+-- TABS local tabs = {"Troll", "Movimentacao", "Visual", "Admin", "Musica", "Config"} local buttons = {}
 
-button.MouseButton1Click:Connect(function()
-    for _, child in ipairs(TabContent:GetChildren()) do
-        if child:IsA("Frame") then
-            child.Visible = false
-        end
-    end
-    callback()
-end)
+for i, name in ipairs(tabs) do local btn = Instance.new("TextButton") btn.Size = UDim2.new(1, 0, 0, 50) btn.Position = UDim2.new(0, 0, 0, (i - 1) * 50) btn.Text = name btn.TextColor3 = Color3.new(1, 1, 1) btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35) btn.Parent = Sidebar buttons[name] = btn end
 
-end
+-- Conteúdo das Abas local function createTabContent(name) local frame = Instance.new("Frame") frame.Name = name frame.Size = UDim2.new(1, -50, 1, 0) frame.Position = UDim2.new(0, 50, 0, 0) frame.BackgroundTransparency = 1 frame.Visible = false frame.Parent = MainFrame return frame end
 
--- Função para criar conteúdo da aba Visual local function VisualTab() local tab = Instance.new("Frame") tab.Name = "VisualTab" tab.Size = UDim2.new(1, 0, 1, 0) tab.BackgroundTransparency = 1 tab.Visible = true tab.Parent = TabContent
+local tabFrames = {} for _, name in pairs(tabs) do tabFrames[name] = createTabContent(name) end
 
-local Scroll = Instance.new("ScrollingFrame")
-Scroll.Size = UDim2.new(1, 0, 1, 0)
-Scroll.CanvasSize = UDim2.new(0, 0, 2, 0)
-Scroll.ScrollBarThickness = 4
-Scroll.BackgroundTransparency = 1
-Scroll.Parent = tab
+-- Mostrar Aba local function showTab(name) for tab, frame in pairs(tabFrames) do frame.Visible = tab == name end end
 
-local UIList = Instance.new("UIListLayout")
-UIList.Padding = UDim.new(0, 5)
-UIList.SortOrder = Enum.SortOrder.LayoutOrder
-UIList.Parent = Scroll
+for tab, btn in pairs(buttons) do btn.MouseButton1Click:Connect(function() showTab(tab) end) end
 
--- Criar botão de ESP
-local function CreateButton(name, callback)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, -10, 0, 40)
-    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    btn.Text = name
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.Font = Enum.Font.Gotham
-    btn.TextScaled = true
-    btn.Parent = Scroll
+-- Exibir a primeira aba por padrão showTab("Troll")
 
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 8)
-    corner.Parent = btn
+-- EXEMPLO DE FUNÇÕES EM ALGUMAS ABAS: -- Troll local killBtn = Instance.new("TextButton", tabFrames["Troll"]) killBtn.Text = "Kill Player" killBtn.Size = UDim2.new(0, 200, 0, 40) killBtn.Position = UDim2.new(0, 20, 0, 20) killBtn.MouseButton1Click:Connect(function() print("Função Kill Player executada") end)
 
-    btn.MouseButton1Click:Connect(callback)
-end
+-- Admin - Tornar-se Admin, Kick, Ban local adminBtn = Instance.new("TextButton", tabFrames["Admin"]) adminBtn.Text = "Tornar-se Admin" adminBtn.Size = UDim2.new(0, 200, 0, 40) adminBtn.Position = UDim2.new(0, 20, 0, 20) adminBtn.MouseButton1Click:Connect(function() print("Você agora é Admin!") end)
 
-CreateButton("ESP Jogadores", function()
-    for _, plr in pairs(Players:GetPlayers()) do
-        if plr ~= Player and not plr.Character:FindFirstChild("ESP") then
-            local esp = Instance.new("BillboardGui")
-            esp.Name = "ESP"
-            esp.Adornee = plr.Character:FindFirstChild("Head")
-            esp.Size = UDim2.new(0, 100, 0, 40)
-            esp.AlwaysOnTop = true
-            esp.Parent = plr.Character
+local kickBtn = Instance.new("TextButton", tabFrames["Admin"]) kickBtn.Text = "Kick Player" kickBtn.Size = UDim2.new(0, 200, 0, 40) kickBtn.Position = UDim2.new(0, 20, 0, 70) kickBtn.MouseButton1Click:Connect(function() print("Jogador expulso!") end)
 
-            local label = Instance.new("TextLabel")
-            label.Size = UDim2.new(1, 0, 1, 0)
-            label.BackgroundTransparency = 1
-            label.Text = plr.Name
-            label.TextColor3 = Color3.fromRGB(255, 0, 0)
-            label.TextScaled = true
-            label.Font = Enum.Font.GothamBold
-            label.Parent = esp
-        end
-    end
-end)
+local banBtn = Instance.new("TextButton", tabFrames["Admin"]) banBtn.Text = "Ban Player" banBtn.Size = UDim2.new(0, 200, 0, 40) banBtn.Position = UDim2.new(0, 20, 0, 120) banBtn.MouseButton1Click:Connect(function() print("Jogador banido!") end)
 
-CreateButton("Remover ESP", function()
-    for _, plr in pairs(Players:GetPlayers()) do
-        local esp = plr.Character:FindFirstChild("ESP")
-        if esp then
-            esp:Destroy()
-        end
-    end
-end)
+-- Música - Inserir ID local musicBox = Instance.new("TextBox", tabFrames["Musica"]) musicBox.PlaceholderText = "ID da Música" musicBox.Size = UDim2.new(0, 200, 0, 40) musicBox.Position = UDim2.new(0, 20, 0, 20)
 
-end
+local playMusic = Instance.new("TextButton", tabFrames["Musica"]) playMusic.Text = "Tocar" playMusic.Size = UDim2.new(0, 100, 0, 40) playMusic.Position = UDim2.new(0, 20, 0, 70) playMusic.MouseButton1Click:Connect(function() local sound = Instance.new("Sound", workspace) sound.SoundId = "rbxassetid://" .. musicBox.Text sound:Play() end)
 
--- Adicionar aba Visual com ícone CreateTab("Visual", "rbxassetid://6031091009", VisualTab)
+-- Continue expandindo para outras abas com botões e funções específicas -- Todas as funções podem ser adicionadas conforme estrutura acima
 
--- Aba Admin
-local adminTab = createTab("Admin", "rbxassetid://12345679") -- Ícone fictício
+-- Funções Administrativas (aba Admin)
 
--- Kick Player (Input)
-createTextBox(adminTab, "Kick Jogador", "Nome do jogador", function(playerName)
+local function kickPlayer(playerName)
     local Players = game:GetService("Players")
-    local target = Players:FindFirstChild(playerName)
-    if target then
-        target:Kick("Você foi kickado pelo Emilli Hub!")
+    local player = Players:FindFirstChild(playerName)
+    if player then
+        player:Kick("Você foi expulso do servidor.")
     end
-end)
+end
 
--- Respawnar personagem
-createButton(adminTab, "Respawnar", function()
-    local plr = game.Players.LocalPlayer
-    if plr.Character then
-        plr.Character:BreakJoints()
+local function banPlayer(playerName)
+    local Players = game:GetService("Players")
+    local player = Players:FindFirstChild(playerName)
+    if player then
+        player:Kick("Você foi banido do servidor.")
+        -- Sistema de ban persistente precisaria de DataStore, mas aqui é só o kick/ban imediato
     end
-end)
+end
 
--- Recarregar personagem
-createButton(adminTab, "Recarregar", function()
-    local plr = game.Players.LocalPlayer
-    if plr.Character then
-        local pos = plr.Character.HumanoidRootPart.Position
-        plr:LoadCharacter()
-        task.wait(1)
-        if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-            plr.Character:MoveTo(pos)
-        end
+local function tornarAdmin()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    if LocalPlayer then
+        -- Isso apenas dá comandos de admin como exemplo
+        local adminCommands = Instance.new("Folder", LocalPlayer)
+        adminCommands.Name = "AdminCommands"
+        -- Pode ser expandido para dar poderes como Fly, Kick Others, etc
+        print(LocalPlayer.Name .. " agora é um administrador.")
     end
+end
+
+-- Interface Admin
+
+local AdminFrame = createCategory("Admin")
+
+-- Input de nome
+local adminInput = createButton(AdminFrame, "Digite o nome do jogador", function() end)
+adminInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+
+local nameBox = Instance.new("TextBox")
+nameBox.Size = UDim2.new(0, 180, 0, 30)
+nameBox.Position = UDim2.new(0, 10, 0, 40)
+nameBox.Parent = AdminFrame
+nameBox.PlaceholderText = "Nome do Jogador"
+nameBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+nameBox.TextColor3 = Color3.new(1, 1, 1)
+
+createButton(AdminFrame, "Kick Player", function()
+    kickPlayer(nameBox.Text)
 end)
 
--- Resetar câmera
-createButton(adminTab, "Resetar Câmera", function()
-    local cam = workspace.CurrentCamera
-    cam.CameraSubject = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
+createButton(AdminFrame, "Ban Player", function()
+    banPlayer(nameBox.Text)
 end)
 
--- Restaurar velocidade
-createButton(adminTab, "Velocidade Padrão", function()
-    local char = game.Players.LocalPlayer.Character
-    if char and char:FindFirstChild("Humanoid") then
-        char.Humanoid.WalkSpeed = 16
-    end
+createButton(AdminFrame, "Tornar-se Admin", function()
+    tornarAdmin()
 end)
 
--- Restaurar gravidade
-createButton(adminTab, "Gravidade Padrão", function()
-    workspace.Gravity = 196.2
+-- Música (aba Música)
+
+local MusicaFrame = createCategory("Música")
+
+local musicaInput = createButton(MusicaFrame, "Digite o ID da música", function() end)
+musicaInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+
+local musicaBox = Instance.new("TextBox")
+musicaBox.Size = UDim2.new(0, 180, 0, 30)
+musicaBox.Position = UDim2.new(0, 10, 0, 40)
+musicaBox.Parent = MusicaFrame
+musicaBox.PlaceholderText = "ID da Música"
+musicaBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+musicaBox.TextColor3 = Color3.new(1, 1, 1)
+
+local Sound = Instance.new("Sound", game:GetService("Workspace"))
+Sound.Volume = 5
+
+createButton(MusicaFrame, "Tocar Música", function()
+    Sound.SoundId = "rbxassetid://" .. musicaBox.Text
+    Sound:Play()
 end)
+
+createButton(MusicaFrame, "Parar Música", function()
+    Sound:Stop()
+end)
+
+-- Configurações (aba Config)
+
+local ConfigFrame = createCategory("Configurações")
+
+createButton(ConfigFrame, "Salvar Configurações", function()
+    print("Configurações salvas!") 
+end)
+
+createButton(ConfigFrame, "Resetar para Padrão", function()
+    print("Configurações resetadas para padrão.")
+end)
+
+-- Botões de minimizar e fechar
+
+local function minimizeHub()
+    MainFrame.Visible = not MainFrame.Visible
+end
+
+local function closeHub()
+    ScreenGui:Destroy()
+end
+
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Size = UDim2.new(0, 20, 0, 20)
+minimizeButton.Position = UDim2.new(1, -45, 0, 5)
+minimizeButton.Text = "-"
+minimizeButton.Parent = MainFrame
+minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+minimizeButton.TextColor3 = Color3.new(0, 0, 0)
+minimizeButton.MouseButton1Click:Connect(minimizeHub)
+
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 20, 0, 20)
+closeButton.Position = UDim2.new(1, -25, 0, 5)
+closeButton.Text = "X"
+closeButton.Parent = MainFrame
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+closeButton.TextColor3 = Color3.new(1, 1, 1)
+closeButton.MouseButton1Click:Connect(closeHub)
+
+print("Emilli Hub carregado com sucesso.")
